@@ -1,0 +1,98 @@
+<div>
+    <section id="main">
+        <video id="player" controls="controls" width="100%" height="400px"></video>
+    </section></div>
+
+<div style="text-align: center;">
+    <section id="buttons" style="position: relative;">
+        <button id="switch">连续: 开</button>
+        <button id="next1">换一个</button>
+        <button id="changeSource">换源</button>
+        <div id="sourceSelectContainer" style="display: none; position: absolute; left: 50%; transform: translateX(-50%); background: #fff; padding: 10px; border-radius: 6px; box-shadow: 0 0 10px rgba(0,0,0,0.3); margin-top: 5px;">
+            <select id="sourceSelect" style="margin-bottom: 5px; width: 100%;">       
+                <option value="http://api.yujn.cn/api/xjj.php">线路1</option>
+                <option value="https://api.yviii.com/video/suiji.php">线路2</option>
+               
+            </select>
+            <button id="applySource" style="background: #7F9CCC; color: #fff; border: none; padding: 5px 10px; border-radius: 3px; width: 100%;">应用</button>
+        </div>
+    </section></div>
+
+<script>
+(function (window, document) {
+    if (top != self) {
+        window.top.location.replace(self.location.href);
+    }
+
+    var get = function(id) { return document.getElementById(id); }
+    var bind = function(element, event, callback) { return element.addEventListener(event, callback); }
+
+    var auto = true;
+    var player = get('player');
+    var sourceSelect = get('sourceSelect');
+
+    // 初始化第一个线路
+    var currentSource = sourceSelect.options[0].value;
+    
+    var randomm = function() {
+        player.src = currentSource + '?_t=' + Math.random();
+        player.play();
+    }
+
+    // 事件绑定
+    bind(get('next1'), 'click', randomm);
+    
+    bind(get('changeSource'), 'click', function() {
+        get('sourceSelectContainer').style.display = 'block';
+    });
+
+    bind(get('applySource'), 'click', function() {
+        currentSource = sourceSelect.value;
+        get('sourceSelectContainer').style.display = 'none';
+        randomm();
+    });
+
+    bind(player, 'error', function() {
+        console.log('视频加载失败，自动切换...');
+        randomm();
+    });
+
+    bind(get('switch'), 'click', function() {
+        auto = !auto;
+        this.innerText = '连续: ' + (auto ? '开' : '关');
+    });
+
+    bind(player, 'ended', function() {
+        if(auto) randomm();
+    });
+
+    // 初始化播放
+    randomm();
+
+})(window, document);
+</script>
+
+<style>
+#switch, #next1, #changeSource {
+    background: #7F9CCC;
+    color: #fff;
+    line-height: 40px;
+    text-align: center;
+    width: 100px;
+    border: none;
+    margin: 0 6px;
+    border-radius: 6px;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+#sourceSelect {
+    padding: 5px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+}
+
+#sourceSelectContainer {
+    z-index: 100;
+}
+</style>
